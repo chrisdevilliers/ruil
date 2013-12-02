@@ -1,0 +1,10 @@
+.eunit
+ebin
+deps
+doc
+*.o
+*.beam
+*.plt
+*.swp
+tags
+.vagrant
