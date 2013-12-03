@@ -1,19 +1,24 @@
-ERL ?= erl
-APP := ruil
+.PHONY: deps test
 
-.PHONY: deps
-
-all: deps
-	@./rebar compile
+all: compile
 
 deps:
-	@./rebar get-deps
+	./rebar get-deps
+
+compile:
+	./rebar compile
+
+test: compile
+	./rebar eunit skip_deps=true
+
+release: compile
+	./rebar generate
 
 clean:
-	@./rebar clean
+	./rebar clean
 
 distclean: clean
-	@./rebar delete-deps
+	./rebar delete-deps
 
-docs:
-	@erl -noshell -run edoc_run application '$(APP)' '"."' '[]'
+#docs:
+#	@erl -noshell -run edoc_run application '$(APP)' '"."' '[]'
