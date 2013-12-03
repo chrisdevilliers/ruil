@@ -1,0 +1,5 @@
+language: erlang
+otp_release:
+  - R16B02
+before_script: "make -C ruil deps"
+script: "make -C ruil test"
