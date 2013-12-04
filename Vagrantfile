@@ -90,6 +90,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe "apt"
     chef.add_recipe "apt::cacher-client"
     chef.add_recipe "erlang"
+    chef.add_recipe "postgresql"
     chef.add_recipe "dev"
   
     # You may also specify custom JSON attributes:
