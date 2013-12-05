@@ -8,9 +8,8 @@
   {applications, [
                   kernel,
                   stdlib,
-                  inets,
-                  crypto,
-                  mochiweb,
+                  sasl,
+                  lager,
                   webmachine
                  ]},
   {mod, { ruil_app, []}},

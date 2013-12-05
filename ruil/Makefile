@@ -8,6 +8,9 @@ deps:
 compile:
 	./rebar compile
 
+run: compile
+	./start.sh
+
 test: compile
 	./rebar eunit skip_deps=true
 

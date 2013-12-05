@@ -5,36 +5,20 @@
 
 -module(ruil).
 -author('author <author@example.com>').
--export([start/0, start_link/0, stop/0]).
-
-ensure_started(App) ->
-    case application:start(App) of
-        ok ->
-            ok;
-        {error, {already_started, App}} ->
-            ok
-    end.
-
-%% @spec start_link() -> {ok,Pid::pid()}
-%% @doc Starts the app for inclusion in a supervisor tree
-start_link() ->
-    ensure_started(inets),
-    ensure_started(crypto),
-    ensure_started(mochiweb),
-    application:set_env(webmachine, webmachine_logger_module, 
-                        webmachine_logger),
-    ensure_started(webmachine),
-    ruil_sup:start_link().
+-export([start/0, stop/0]).
 
 %% @spec start() -> ok
 %% @doc Start the ruil server.
 start() ->
-    ensure_started(inets),
-    ensure_started(crypto),
-    ensure_started(mochiweb),
-    application:set_env(webmachine, webmachine_logger_module, 
-                        webmachine_logger),
-    ensure_started(webmachine),
+    ok = application:ensure_started(sasl),
+    ok = application:ensure_started(syntax_tools),
+    ok = application:ensure_started(compiler),
+    ok = application:ensure_started(goldrush),
+    ok = application:ensure_started(lager),
+    ok = application:ensure_started(crypto),
+    ok = application:ensure_started(inets),
+    ok = application:ensure_started(mochiweb),
+    ok = application:ensure_started(webmachine),
     application:start(ruil).
 
 %% @spec stop() -> ok
@@ -43,6 +27,11 @@ stop() ->
     Res = application:stop(ruil),
     application:stop(webmachine),
     application:stop(mochiweb),
-    application:stop(crypto),
     application:stop(inets),
+    application:stop(crypto),
+    application:stop(lager),
+    application:stop(goldrush),
+    application:stop(compiler),
+    application:stop(syntax_tools),
+    application:stop(sasl),
     Res.
