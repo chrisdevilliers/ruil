@@ -39,6 +39,8 @@ END
 $$
 LANGUAGE plpgsql;
 
+CREATE TYPE currency AS ENUM ('ZAR', 'BTC');
+
 CREATE TABLE user
 (
     id UUID PRIMARY KEY,
@@ -57,23 +59,13 @@ COMMENT ON COLUMN user.email IS
 'The user''s email address.';
 -- ...
 
-CREATE TABLE template_wallet
+CREATE TABLE wallet
 (
-    user_id UUID PRIMARY KEY,
-    balance NUMERIC NOT NULL
+    user_id UUID NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+    currency currency NOT NULL,
+    balance NUMERIC NOT NULL,
+    PRIMARY KEY (user_id, currency)
 );
-
-CREATE TABLE zar_wallet
-(
-    PRIMARY KEY (user_id),
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
-) INHERITS (template_wallet);
-
-CREATE TABLE btc_wallet(
-    PRIMARY KEY (user_id),
-    FOREIGN KEY (user_id) REFERENCES user(id)
-) INHERITS (template_wallet);
-
 
 CREATE TABLE user_event
 (
@@ -87,7 +79,6 @@ CREATE TABLE user_event
 
 CREATE TYPE order_state AS ENUM ('unfilled', 'partial', 'filled');
 
-CREATE TYPE currency AS ENUM ('ZAR', 'BTC');
 
 CREATE TABLE template_order
 (
