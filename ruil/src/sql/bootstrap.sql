@@ -39,9 +39,9 @@ END
 $$
 LANGUAGE plpgsql;
 
-CREATE TYPE currency AS ENUM ('ZAR', 'BTC');
+CREATE TYPE currency_type AS ENUM ('ZAR', 'BTC');
 
-CREATE TABLE user
+CREATE TABLE client
 (
     id UUID PRIMARY KEY,
     email TEXT NOT NULL UNIQUE, -- consider creating a DOMAIN for this
@@ -53,28 +53,28 @@ CREATE TABLE user
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
-COMMENT ON COLUMN user.id IS
-'The user''s internal ID';
-COMMENT ON COLUMN user.email IS
-'The user''s email address.';
+COMMENT ON COLUMN client.id IS
+'The client''s internal ID';
+COMMENT ON COLUMN client.email IS
+'The client''s email address.';
 -- ...
 
 CREATE TABLE wallet
 (
-    user_id UUID NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-    currency currency NOT NULL,
+    client_id UUID NOT NULL REFERENCES client(id) ON DELETE CASCADE,
+    currency currency_type NOT NULL,
     balance NUMERIC NOT NULL,
-    PRIMARY KEY (user_id, currency)
+    PRIMARY KEY (client_id, currency)
 );
 
-CREATE TABLE user_event
+CREATE TABLE client_event
 (
-    timestamp WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    user_id UUID NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    client_id UUID NOT NULL REFERENCES client(id) ON DELETE CASCADE,
 --  event_id?
 --  event_type
 --  other info
-    PRIMARY KEY (timestamp, user_id)
+    PRIMARY KEY (timestamp, client_id)
 );
 
 CREATE TYPE order_state AS ENUM ('unfilled', 'partial', 'filled');
@@ -83,13 +83,13 @@ CREATE TYPE order_state AS ENUM ('unfilled', 'partial', 'filled');
 CREATE TABLE template_order
 (
     id UUID PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+    client_id UUID NOT NULL REFERENCES client(id) ON DELETE CASCADE,
     state order_state NOT NULL,
     expiry TIMESTAMP WITH TIME ZONE NOT NULL,
     volume NUMERIC NOT NULL,
-    volume_currency currency NOT NULL,
+    volume_currency currency_type NOT NULL,
     amount NUMERIC NOT NULL,
-    amount_currenct currency NOT NULL
+    amount_currenct currency_type NOT NULL
 -- created_at
 -- updated_at
 );
@@ -97,13 +97,13 @@ CREATE TABLE template_order
 CREATE TABLE buy_order
 (
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
 ) INHERITS (template_order);
 
 CREATE TABLE sell_order
 (
     PRIMARY KEY(id),
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCASDE
+    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
 ) INHERITS (template_order);
 
 
@@ -111,8 +111,8 @@ CREATE TABLE trades
 (
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     volume NUMERIC NOT NULL,
-    volume_currency currency NOT NULL,
+    volume_currency currency_type NOT NULL,
     amount NUMERIC NOT NULL,
-    amount_currency currency NOT NULL
+    amount_currency currency_type NOT NULL
 );
 

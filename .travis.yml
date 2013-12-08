@@ -2,4 +2,6 @@ language: erlang
 otp_release:
   - R16B02
 install: "make -C ruil deps"
+before_script:
+  - psql -f ruil/src/sql/bootstrap.sql -U postgres
 script: "make -C ruil test"
